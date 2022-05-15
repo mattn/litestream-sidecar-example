@@ -1,0 +1,14 @@
+dbs:
+  - path: /data/bbs.sqlite
+    replicas:
+      - type: s3
+        endpoint: https://your-minio.example.com
+        name: bbs.sqlite
+        bucket: entgo-bbs
+        path: bbs.sqlite
+        region: us-east1
+        forcePathStyle: true
+        sync-interval: 1s
+        access-key-id: your-minio-access-key
+        secret-access-key: your-minio-secret-key
+

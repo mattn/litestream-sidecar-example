@@ -1,0 +1,43 @@
+version: '2'
+services:
+
+  restore-container:
+    image: litestream/litestream
+    container_name: restore
+    tty: true
+    volumes:
+      - '/data'
+      - './:/opt/litestream'
+    entrypoint: /bin/sh
+    command: -c "
+      rm -f /data/bbs.sqlite &&
+      /usr/local/bin/litestream restore -config /opt/litestream/litestream.yaml /data/bbs.sqlite
+      "
+
+  app-container:
+    image: mattn/entgo-bbs
+    container_name: app
+    tty: true
+    volumes_from:
+      - restore-container:rw
+    depends_on:
+      - 'restore-container'
+    ports:
+      - 8989:8989
+    command:
+      - '/go/bin/entgo-bbs'
+      - '-dsn'
+      - 'file:/data/bbs.sqlite?cache=shared&_fk=1'
+
+  backup-container:
+    image: litestream/litestream
+    container_name: backup
+    tty: true
+    depends_on:
+      - 'app'
+    volumes_from:
+      - restore-container:rw
+    entrypoint: /bin/sh
+    command: -c "
+      /usr/local/bin/litestream replicate -config /opt/litestream/litestream.yaml
+      "
