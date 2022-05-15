@@ -14,6 +14,10 @@ At the first, this restore-container restore bbs.sqlite from your S3 storage. An
 
 So you can completely delete containers from the host.
 
+```
+$ docker compose rm -v -f
+```
+
 ## License
 
 MIT
